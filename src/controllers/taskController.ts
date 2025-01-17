@@ -11,7 +11,7 @@ export const createTask = async (
     try {
         const { title, description, completed } = taskSchema.parse(req.body);
 
-        const userId = req.auth?.sub;
+        const userId = req.userId;
         if (!userId) {
             res.status(401).json({ message: "User ID is missing in the token" });
             return;
@@ -32,7 +32,7 @@ export const getTasks = async (
     next: NextFunction
     ): Promise<void> => {
     try {
-        const userId = req.auth?.sub;
+        const userId = req.userId;
 
         if (!userId) {
         res.status(401).json({ message: "User ID is missing in the token" });
@@ -52,9 +52,9 @@ export const getTaskById = async (
     next: NextFunction
     ): Promise<void> => {
     try {
-        const { id } = taskIdSchema.parse(req.params);
-    
-        const userId = req.auth?.sub;
+        const { id } = taskIdSchema.parse(req.params);    
+        const userId = req.userId;
+
         if (!userId) {
             res.status(401).json({ message: "User ID is missing in the token" });
             return;
@@ -81,7 +81,7 @@ export const updateTask = async (
         const { id } = taskIdSchema.parse(req.params);
         const { title, description, completed } = taskSchema.partial().parse(req.body);
     
-        const userId = req.auth?.sub;
+        const userId = req.userId;
         if (!userId) {
             res.status(401).json({ message: "User ID is missing in the token" });
             return;
@@ -110,9 +110,9 @@ export const deleteTask = async (
     next: NextFunction
     ): Promise<void> => {
     try {
-        const { id } = taskIdSchema.parse(req.params);
-    
-        const userId = req.auth?.sub;
+        const { id } = taskIdSchema.parse(req.params);    
+        const userId = req.userId;
+        
         if (!userId) {
             res.status(401).json({ message: "User ID is missing in the token" });
             return;

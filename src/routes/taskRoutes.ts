@@ -1,5 +1,5 @@
 import { Router } from "express";
-import checkJwt from "../middleware/auth";
+import { authenticateJWT } from "../middleware/jwtAuth";
 import { 
     createTask,
     getTasks,
@@ -10,10 +10,10 @@ import {
 
 const router = Router();
 
-router.post("/todos", createTask);
-router.get("/todos", getTasks);
-router.get("/todos/:id", getTaskById);
-router.put("/todos/:id", updateTask);
-router.delete("/todos/:id", deleteTask);
+router.post("/todos",authenticateJWT, createTask);
+router.get("/todos",authenticateJWT, getTasks);
+router.get("/todos/:id",authenticateJWT, getTaskById);
+router.put("/todos/:id",authenticateJWT, updateTask);
+router.delete("/todos/:id",authenticateJWT, deleteTask);
 
 export default router;
