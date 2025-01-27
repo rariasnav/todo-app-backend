@@ -12,7 +12,7 @@ const TaskSchema: Schema = new Schema (
         title: { type: String, require: true },
         description: { type: String },
         completed: { type: Boolean, default: false },
-        userId: { type: String, require: true },
+        userId: { type: Schema.Types.ObjectId, ref: "User", require: true, index: true },
     },
     { timestamps: true }
 );

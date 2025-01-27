@@ -14,11 +14,19 @@ if (process.env.NODE_ENV === "test") {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:3000"];
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || "*",
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error ("CORS policy violation"))
+        }
+    },
     credentials: true,
 };
-app.use(cors({origin: "*"}));
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
@@ -29,7 +37,13 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     if (err.name === "ZodError") {
         return res.status(400).json({ message: err.errors });
     }
-    res.status(500).json({ message: err.message });
+    if (err.name === "ValidationError") {
+        return res.status(400).json({ message: "Validation error", details: err.message });
+    }
+    if (err.name === "CORS policy violation") {
+        return res.status(403).json({ message: "CORS policy violation" });
+    }
+    res.status(500).json({ message: err.message || "Internal Server Error" });
 });
 
 if (process.env.NODE_ENV !== "test") {

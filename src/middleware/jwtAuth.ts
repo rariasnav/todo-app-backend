@@ -21,6 +21,15 @@ export const authenticateJWT = (
         req.userId = decoded.userId;
         next();
     } catch (error) {
-        res.status(401).json({ message: "Invalid or expired token" });
+        if (error instanceof Error) {
+            if (error.name === "TokenExpiredError") {
+                res.status(401).json({ message: "Token expired" });
+                return;
+            }
+            res.status(401).json({ message: "Invalid or expired token" });
+            return;
+        }
+
+        res.status(500).json({ message: "An unknown error occurred" });
     }
 }
