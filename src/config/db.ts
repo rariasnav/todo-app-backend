@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import vEnvConfig from "./vEnvConfig";
 
-dotenv.config();
 
 const connectDB = async () => {
+    const mongoUri = vEnvConfig.mongoUri;
+    if (!mongoUri) {
+        console.error("MONGO_URI is not defined");
+        process.exit(1);
+    }
+
     try {
-        await mongoose.connect(process.env.MONGO_URI || "");
+        await mongoose.connect(mongoUri);
         console.log("Mongo DB connected succesfully");
     } catch (error) {
         console.error("Mongo DB connectio failed", error);

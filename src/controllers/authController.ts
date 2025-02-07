@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/User";
 import { generateToken } from "../utils/jwt";
-import { z } from "zod";
+import { registerUserSchema, loginUserSchema } from "../utils/validation";
 
 
 export const registerUser = async (
@@ -11,13 +11,7 @@ export const registerUser = async (
     next: NextFunction
 ): Promise<Response | void> => {
     try {
-        const { name, email, password } = z
-        .object({
-            name: z.string().min(1, "Name is required"),
-            email: z.string().email("Invalid email"),
-            password: z.string().min(6, "Password must be at least 6 characters"),
-        })
-        .parse(req.body);
+        const { name, email, password } = registerUserSchema.parse(req.body);
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -41,12 +35,7 @@ export const loginUser = async (
     next: NextFunction
 ): Promise<Response | void> => {
     try {
-        const { email, password } = z
-        .object({
-            email: z.string().email("Invalid email"),
-            password: z.string().min(6, "Password must be at least 6 characters"),
-        })
-        .parse(req.body);
+        const { email, password } = loginUserSchema.parse(req.body);
 
         const user = await User.findOne({ email });
         if (!user) {

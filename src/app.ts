@@ -1,24 +1,15 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import taskRoutes from "./routes/taskRoutes";
+import vEnvConfig from "./config/vEnvConfig";
 
-if (process.env.NODE_ENV === "test") {
-    dotenv.config({ path: ".env.test" });
-} else {
-    dotenv.config();
-}
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:3000"];
 
 const corsOptions = {
-    origin: allowedOrigins,
+    origin: vEnvConfig.allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -45,8 +36,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 if (process.env.NODE_ENV !== "test") {
     connectDB();
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+    app.listen(vEnvConfig.port, () => {
+        console.log(`Server running on http://localhost:${vEnvConfig.port}`);
     });
 }
 
