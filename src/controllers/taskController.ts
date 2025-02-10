@@ -104,6 +104,43 @@ export const updateTask = async (
     }
 };
 
+export const toggleTaskCompleted = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = taskIdSchema.parse(req.params);
+
+        const userId = req.userId;
+        if (!userId) {
+            res.status(401).json({ message: "User ID is missing in the token" });
+            return;
+        }
+
+        const { completed } = req.body;
+        if (typeof completed !== "boolean") {
+            res.status(400).json({ message: "Invalid completed value" });
+            return;
+        }
+
+        const updatedTask = await Task.findOneAndUpdate(
+            { _id: id, userId },
+            { $set: { completed } },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedTask) {
+            res.status(404).json({ message: "Task not found" });
+            return;
+        }
+
+        res.status(200).json(updatedTask);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const deleteTask = async (
     req: AuthenticatedRequest,
     res: Response,
